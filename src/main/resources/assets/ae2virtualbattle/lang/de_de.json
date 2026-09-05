@@ -1,0 +1,20 @@
+{
+  "itemGroup.ae2virtualbattle": "AE2 Virtual Battle",
+  "item.ae2virtualbattle.battle_cell_housing": "Virtuelles Kampfzellengehäuse",
+  "item.ae2virtualbattle.battle_cell_component_1k": "1k Virtuelle Kampfspeicherkomponente",
+  "item.ae2virtualbattle.battle_cell_component_4k": "4k Virtuelle Kampfspeicherkomponente",
+  "item.ae2virtualbattle.battle_cell_component_16k": "16k Virtuelle Kampfspeicherkomponente",
+  "item.ae2virtualbattle.battle_cell_component_64k": "64k Virtuelle Kampfspeicherkomponente",
+  "item.ae2virtualbattle.battle_cell_component_256k": "256k Virtuelle Kampfspeicherkomponente",
+  "item.ae2virtualbattle.battle_storage_cell_1k": "1k Virtuelle Kampfspeicherzelle",
+  "item.ae2virtualbattle.battle_storage_cell_4k": "4k Virtuelle Kampfspeicherzelle",
+  "item.ae2virtualbattle.battle_storage_cell_16k": "16k Virtuelle Kampfspeicherzelle",
+  "item.ae2virtualbattle.battle_storage_cell_64k": "64k Virtuelle Kampfspeicherzelle",
+  "item.ae2virtualbattle.battle_storage_cell_256k": "256k Virtuelle Kampfspeicherzelle",
+  "tooltip.ae2virtualbattle.tier": "Stufe: %s",
+  "tooltip.ae2virtualbattle.production": "Erzeugt %s Drop(s) alle %s Sekunden",
+  "tooltip.ae2virtualbattle.configured_target": "Ziel-Mob: %s",
+  "tooltip.ae2virtualbattle.not_configured": "Nicht partitioniert (In Zellen-Werkbank oder Shift+Rechtsklick mit Mob-Drop in der Zweithand)",
+  "message.ae2virtualbattle.configured": "Virtuelle Kampfzelle eingestellt auf: %s",
+  "message.ae2virtualbattle.cleared": "Virtuelle Kampfzellen-Konfiguration gelöscht"
+}

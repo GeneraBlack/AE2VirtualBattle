@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "ae2:cell_component_1k" },
+    { "item": "minecraft:rotten_flesh" },
+    { "item": "minecraft:bone" }
+  ],
+  "result": {
+    "id": "ae2virtualbattle:battle_cell_component_1k",
+    "count": 1
+  }
+}

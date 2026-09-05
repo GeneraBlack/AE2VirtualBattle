@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "ae2virtualbattle:battle_cell_housing" },
+    { "item": "ae2virtualbattle:battle_cell_component_4k" }
+  ],
+  "result": {
+    "id": "ae2virtualbattle:battle_storage_cell_4k",
+    "count": 1
+  }
+}

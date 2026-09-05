@@ -1,0 +1,20 @@
+{
+  "itemGroup.ae2virtualbattle": "AE2 Virtual Battle",
+  "item.ae2virtualbattle.battle_cell_housing": "Virtual Battle Cell Housing",
+  "item.ae2virtualbattle.battle_cell_component_1k": "1k Virtual Battle Storage Component",
+  "item.ae2virtualbattle.battle_cell_component_4k": "4k Virtual Battle Storage Component",
+  "item.ae2virtualbattle.battle_cell_component_16k": "16k Virtual Battle Storage Component",
+  "item.ae2virtualbattle.battle_cell_component_64k": "64k Virtual Battle Storage Component",
+  "item.ae2virtualbattle.battle_cell_component_256k": "256k Virtual Battle Storage Component",
+  "item.ae2virtualbattle.battle_storage_cell_1k": "1k Virtual Battle Storage Cell",
+  "item.ae2virtualbattle.battle_storage_cell_4k": "4k Virtual Battle Storage Cell",
+  "item.ae2virtualbattle.battle_storage_cell_16k": "16k Virtual Battle Storage Cell",
+  "item.ae2virtualbattle.battle_storage_cell_64k": "64k Virtual Battle Storage Cell",
+  "item.ae2virtualbattle.battle_storage_cell_256k": "256k Virtual Battle Storage Cell",
+  "tooltip.ae2virtualbattle.tier": "Tier: %s",
+  "tooltip.ae2virtualbattle.production": "Produces %s drop(s) every %s seconds",
+  "tooltip.ae2virtualbattle.configured_target": "Target Mob: %s",
+  "tooltip.ae2virtualbattle.not_configured": "Unpartitioned (Partition in Cell Workbench or Shift+Right Click with Mob Drop in Off-hand)",
+  "message.ae2virtualbattle.configured": "Virtual Battle Cell configured for: %s",
+  "message.ae2virtualbattle.cleared": "Virtual Battle Cell configuration cleared"
+}

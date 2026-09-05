@@ -1,0 +1,21 @@
+{
+  "type": "ae2virtualbattle:battle_drop",
+  "target": {
+    "item": "minecraft:netherite_sword"
+  },
+  "min_tier": 4,
+  "drops": [
+    {
+      "item": { "id": "minecraft:netherite_scrap", "count": 1 },
+      "weight": 50,
+      "min_count": 1,
+      "max_count": 1
+    },
+    {
+      "item": { "id": "minecraft:ancient_debris", "count": 1 },
+      "weight": 25,
+      "min_count": 1,
+      "max_count": 1
+    }
+  ]
+}
