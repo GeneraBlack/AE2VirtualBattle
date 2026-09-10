@@ -2,13 +2,15 @@ package de.project.ae2virtualbattle.recipe;
 
 import de.project.ae2virtualbattle.registry.ModRecipes;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 
@@ -283,12 +285,15 @@ public class BattleDropRegistry {
             return true;
         }
         if (level != null) {
-            SingleRecipeInput input = new SingleRecipeInput(new ItemStack(item));
-            if (level.getRecipeManager().getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level).isPresent()) {
-                return true;
+            RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : (level.getServer() != null ? level.getServer().getRecipeManager() : null);
+            if (recipeManager != null) {
+                SingleRecipeInput input = new SingleRecipeInput(new ItemStack(item));
+                if (recipeManager.getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level).isPresent()) {
+                    return true;
+                }
             }
         }
-        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        Identifier id = BuiltInRegistries.ITEM.getKey(item);
         String path = id.getPath();
         return path.contains("spawn_egg") || path.contains("head") || path.contains("skull") || path.contains("meat") || path.contains("flesh");
     }
@@ -303,13 +308,16 @@ public class BattleDropRegistry {
         }
 
         if (level != null) {
-            SingleRecipeInput input = new SingleRecipeInput(new ItemStack(target));
-            Optional<RecipeHolder<BattleDropRecipe>> recipe = level.getRecipeManager()
-                    .getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level);
-            if (recipe.isPresent()) {
-                List<BattleDropEntry> drops = recipe.get().value().drops();
-                DYNAMIC_CACHE.put(target, drops);
-                return drops;
+            RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : (level.getServer() != null ? level.getServer().getRecipeManager() : null);
+            if (recipeManager != null) {
+                SingleRecipeInput input = new SingleRecipeInput(new ItemStack(target));
+                Optional<RecipeHolder<BattleDropRecipe>> recipe = recipeManager
+                        .getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level);
+                if (recipe.isPresent()) {
+                    List<BattleDropEntry> drops = recipe.get().value().drops();
+                    DYNAMIC_CACHE.put(target, drops);
+                    return drops;
+                }
             }
         }
 
@@ -345,7 +353,7 @@ public class BattleDropRegistry {
                 int min = entry.minCount();
                 int max = entry.maxCount();
                 int count = (min >= max) ? min : (min + random.nextInt(max - min + 1));
-                ItemStack result = entry.item().copy();
+                ItemStack result = entry.createStack();
                 result.setCount(count);
                 return result;
             }

@@ -1,18 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": "ae2:quartz_glass",
+    "R": "minecraft:redstone",
+    "S": "minecraft:iron_sword",
+    "I": "minecraft:iron_ingot"
+  },
   "pattern": [
     "GRG",
     "RSR",
     "III"
   ],
-  "key": {
-    "G": { "item": "ae2:quartz_glass" },
-    "R": { "item": "minecraft:redstone" },
-    "S": { "item": "minecraft:iron_sword" },
-    "I": { "item": "minecraft:iron_ingot" }
-  },
   "result": {
-    "id": "ae2virtualbattle:battle_cell_housing",
-    "count": 1
+    "id": "ae2virtualbattle:battle_cell_housing"
   }
 }

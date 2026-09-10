@@ -3,6 +3,7 @@ package de.project.ae2virtualbattle.registry;
 import de.project.ae2virtualbattle.AE2VirtualBattle;
 import de.project.ae2virtualbattle.recipe.BattleDropRecipe;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -16,8 +17,8 @@ public class ModRecipes {
             DeferredRegister.create(Registries.RECIPE_TYPE, AE2VirtualBattle.MODID);
 
     public static final DeferredHolder<RecipeType<?>, RecipeType<BattleDropRecipe>> BATTLE_DROP_TYPE =
-            RECIPE_TYPES.register("battle_drop", () -> RecipeType.simple(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(AE2VirtualBattle.MODID, "battle_drop")));
+            RECIPE_TYPES.register("battle_drop", () -> RecipeType.simple(Identifier.fromNamespaceAndPath(AE2VirtualBattle.MODID, "battle_drop")));
 
-    public static final DeferredHolder<RecipeSerializer<?>, BattleDropRecipe.Serializer> BATTLE_DROP_SERIALIZER =
-            SERIALIZERS.register("battle_drop", BattleDropRecipe.Serializer::new);
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BattleDropRecipe>> BATTLE_DROP_SERIALIZER =
+            SERIALIZERS.register("battle_drop", () -> new RecipeSerializer<>(BattleDropRecipe.CODEC, BattleDropRecipe.STREAM_CODEC));
 }
