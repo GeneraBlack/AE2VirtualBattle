@@ -39,6 +39,13 @@ public class AE2VirtualBattle {
 
         // Register Setup Listener
         modEventBus.addListener(this::commonSetup);
+
+        // Clear dynamic recipe cache on datapack reload
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.OnDatapackSyncEvent event) -> {
+            if (event.getPlayer() == null) {
+                de.project.ae2virtualbattle.recipe.BattleDropRegistry.clearCache();
+            }
+        });
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {

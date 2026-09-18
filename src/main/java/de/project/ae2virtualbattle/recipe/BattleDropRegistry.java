@@ -278,12 +278,6 @@ public class BattleDropRegistry {
     }
 
     public static boolean isValidBattleTarget(Item item, Level level) {
-        if (BUILTIN_DROPS.containsKey(item) || DYNAMIC_CACHE.containsKey(item)) {
-            return true;
-        }
-        if (item instanceof SpawnEggItem) {
-            return true;
-        }
         if (level != null) {
             RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : (level.getServer() != null ? level.getServer().getRecipeManager() : null);
             if (recipeManager != null) {
@@ -293,20 +287,19 @@ public class BattleDropRegistry {
                 }
             }
         }
+        if (DYNAMIC_CACHE.containsKey(item) || BUILTIN_DROPS.containsKey(item)) {
+            return true;
+        }
+        if (item instanceof SpawnEggItem) {
+            return true;
+        }
         Identifier id = BuiltInRegistries.ITEM.getKey(item);
         String path = id.getPath();
         return path.contains("spawn_egg") || path.contains("head") || path.contains("skull") || path.contains("meat") || path.contains("flesh");
     }
 
     public static List<BattleDropEntry> getDropEntries(Item target, Level level) {
-        if (BUILTIN_DROPS.containsKey(target)) {
-            return BUILTIN_DROPS.get(target);
-        }
-
-        if (DYNAMIC_CACHE.containsKey(target)) {
-            return DYNAMIC_CACHE.get(target);
-        }
-
+        // 1. Check custom datapack recipes first (allows overriding built-in defaults)
         if (level != null) {
             RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : (level.getServer() != null ? level.getServer().getRecipeManager() : null);
             if (recipeManager != null) {
@@ -321,7 +314,17 @@ public class BattleDropRegistry {
             }
         }
 
-        // Dynamic fallback for any unknown SpawnEggItem: produces its default drop if possible or 1 item
+        // 2. Check dynamic cache (covers cases where recipe was cached, e.g. when level is null during cell insertion)
+        if (DYNAMIC_CACHE.containsKey(target)) {
+            return DYNAMIC_CACHE.get(target);
+        }
+
+        // 3. Fallback to hardcoded built-in drops
+        if (BUILTIN_DROPS.containsKey(target)) {
+            return BUILTIN_DROPS.get(target);
+        }
+
+        // 4. Dynamic fallback for any unknown SpawnEggItem: produces its default drop if possible or 1 item
         if (target instanceof SpawnEggItem) {
             List<BattleDropEntry> fallback = List.of(new BattleDropEntry(new ItemStack(Items.ROTTEN_FLESH), 100, 1, 2));
             DYNAMIC_CACHE.put(target, fallback);
@@ -329,6 +332,10 @@ public class BattleDropRegistry {
         }
 
         return List.of();
+    }
+
+    public static void clearCache() {
+        DYNAMIC_CACHE.clear();
     }
 
     public static ItemStack rollDrop(List<BattleDropEntry> entries, RandomSource random) {
