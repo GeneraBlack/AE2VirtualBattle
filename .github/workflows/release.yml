@@ -18,7 +18,7 @@ on:
       changelog:
         description: "Changelog text"
         required: false
-        default: "Initial release of AE2 Virtual Battle for Minecraft 1.21.1 (NeoForge)."
+        default: "Release of AE2 Virtual Battle for Minecraft 1.21.1 (NeoForge)."
         type: string
 
 jobs:
