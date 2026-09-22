@@ -1,9 +1,12 @@
 package de.project.ae2virtualbattle.recipe;
 
+import de.project.ae2virtualbattle.config.VirtualBattleConfig;
 import de.project.ae2virtualbattle.registry.ModRecipes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +20,13 @@ import net.minecraft.world.level.Level;
 import java.util.*;
 
 public class BattleDropRegistry {
+
+    private static final TagKey<Item> BONES_TAG = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "bones"));
+    private static final TagKey<Item> RODS_TAG = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "rods"));
+    private static final TagKey<Item> SLIME_BALLS_TAG = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "slime_balls"));
+    private static final TagKey<Item> STRINGS_TAG = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "strings"));
+    private static final TagKey<Item> ENDER_PEARLS_TAG = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ender_pearls"));
+    private static final TagKey<Item> SKULLS_TAG = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "skulls"));
 
     private static final Map<Item, List<BattleDropEntry>> BUILTIN_DROPS = new HashMap<>();
     private static final Map<Item, List<BattleDropEntry>> DYNAMIC_CACHE = new HashMap<>();
@@ -277,6 +287,16 @@ public class BattleDropRegistry {
         BUILTIN_DROPS.put(target, drops);
     }
 
+    private static boolean hasBattleTag(Item item) {
+        var holder = item.builtInRegistryHolder();
+        return holder.is(BONES_TAG)
+                || holder.is(RODS_TAG)
+                || holder.is(SLIME_BALLS_TAG)
+                || holder.is(STRINGS_TAG)
+                || holder.is(ENDER_PEARLS_TAG)
+                || holder.is(SKULLS_TAG);
+    }
+
     public static boolean isValidBattleTarget(Item item, Level level) {
         if (level != null) {
             RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : (level.getServer() != null ? level.getServer().getRecipeManager() : null);
@@ -290,12 +310,18 @@ public class BattleDropRegistry {
         if (DYNAMIC_CACHE.containsKey(item) || BUILTIN_DROPS.containsKey(item)) {
             return true;
         }
-        if (item instanceof SpawnEggItem) {
+        if (hasBattleTag(item)) {
             return true;
         }
-        Identifier id = BuiltInRegistries.ITEM.getKey(item);
-        String path = id.getPath();
-        return path.contains("spawn_egg") || path.contains("head") || path.contains("skull") || path.contains("meat") || path.contains("flesh");
+        if (VirtualBattleConfig.ENABLE_DYNAMIC_FALLBACK.get()) {
+            if (item instanceof SpawnEggItem) {
+                return true;
+            }
+            Identifier id = BuiltInRegistries.ITEM.getKey(item);
+            String path = id.getPath();
+            return path.contains("spawn_egg");
+        }
+        return false;
     }
 
     public static List<BattleDropEntry> getDropEntries(Item target, Level level) {
@@ -324,11 +350,13 @@ public class BattleDropRegistry {
             return BUILTIN_DROPS.get(target);
         }
 
-        // 4. Dynamic fallback for any unknown SpawnEggItem: produces its default drop if possible or 1 item
-        if (target instanceof SpawnEggItem) {
-            List<BattleDropEntry> fallback = List.of(new BattleDropEntry(new ItemStack(Items.ROTTEN_FLESH), 100, 1, 2));
-            DYNAMIC_CACHE.put(target, fallback);
-            return fallback;
+        // 4. Dynamic fallback (only if enabled and target is an unknown spawn egg)
+        if (VirtualBattleConfig.ENABLE_DYNAMIC_FALLBACK.get()) {
+            if (target instanceof SpawnEggItem || BuiltInRegistries.ITEM.getKey(target).getPath().contains("spawn_egg")) {
+                List<BattleDropEntry> fallback = List.of(new BattleDropEntry(new ItemStack(Items.ROTTEN_FLESH), 100, 1, 2));
+                DYNAMIC_CACHE.put(target, fallback);
+                return fallback;
+            }
         }
 
         return List.of();
