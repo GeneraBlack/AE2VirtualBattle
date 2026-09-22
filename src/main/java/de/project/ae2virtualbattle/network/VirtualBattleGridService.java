@@ -85,7 +85,7 @@ public class VirtualBattleGridService implements IGridServiceProvider, IVirtualB
         }
 
         Item target = battleCell.getConfiguredTarget();
-        if (target == null) {
+        if (target == null || !BattleDropRegistry.isValidBattleTarget(target, level)) {
             return false;
         }
 

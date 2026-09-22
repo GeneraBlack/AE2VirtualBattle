@@ -8,6 +8,8 @@ public class VirtualBattleConfig {
     public static final ModConfigSpec.IntValue BASE_TICK_INTERVAL;
     public static final ModConfigSpec.DoubleValue ENERGY_PER_DROP;
     public static final ModConfigSpec.BooleanValue REQUIRE_AE_ENERGY;
+    public static final ModConfigSpec.BooleanValue ENABLE_DYNAMIC_FALLBACK;
+    public static final ModConfigSpec.BooleanValue ENFORCE_INVENTORY_CHECK;
 
     public static final ModConfigSpec.IntValue TIER_1K_DROPS;
     public static final ModConfigSpec.IntValue TIER_4K_DROPS;
@@ -31,6 +33,14 @@ public class VirtualBattleConfig {
         ENERGY_PER_DROP = builder
                 .comment("AE energy consumed per generated mob drop")
                 .defineInRange("energyPerDrop", 15.0, 0.0, 100000.0);
+
+        ENABLE_DYNAMIC_FALLBACK = builder
+                .comment("Whether to enable dynamic fallback drop generation for unknown mob spawn eggs / targets without explicit recipes")
+                .define("enableDynamicFallback", true);
+
+        ENFORCE_INVENTORY_CHECK = builder
+                .comment("Whether configuring a cell in the Cell Workbench requires the player to actually possess the target item in their inventory")
+                .define("enforceInventoryCheck", false);
 
         builder.pop();
 

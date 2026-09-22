@@ -67,7 +67,7 @@ public class VirtualBattleCellItem extends Item implements ICellWorkbenchItem {
 
     @Override
     public ConfigInventory getConfigInventory(ItemStack stack) {
-        return CellConfig.create(Set.of(AEKeyType.items()), stack);
+        return BattleCellConfig.create(stack);
     }
 
     @Override
