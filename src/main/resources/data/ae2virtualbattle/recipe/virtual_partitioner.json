@@ -13,14 +13,18 @@
     },
     "S": {
       "item": "minecraft:smooth_stone"
+    },
+    "W": {
+      "item": "minecraft:iron_sword"
     }
   },
   "pattern": [
     "ICI",
-    "RSR",
+    "RWR",
     "SIS"
   ],
   "result": {
+    "count": 1,
     "id": "ae2virtualbattle:virtual_partitioner"
   }
 }

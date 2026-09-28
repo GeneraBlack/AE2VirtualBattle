@@ -120,8 +120,7 @@ public class VirtualBattleCellItem extends Item implements ICellWorkbenchItem {
                     .withStyle(ChatFormatting.GRAY));
         }
 
-        boolean hasVoidSecondary = upgrades.isInstalled(ModItems.VOID_SECONDARY_CARD.get())
-                || upgrades.isInstalled(AEItems.VOID_CARD.asItem());
+        boolean hasVoidSecondary = de.project.ae2virtualbattle.util.VirtualCellAdapter.hasVoidSecondaryCard(upgrades);
         if (hasVoidSecondary) {
             tooltipAdder.accept(Component.translatable("tooltip.ae2virtualbattle.void_secondary_active")
                     .withStyle(ChatFormatting.DARK_PURPLE));

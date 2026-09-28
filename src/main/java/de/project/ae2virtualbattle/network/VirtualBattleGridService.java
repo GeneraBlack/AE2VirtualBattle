@@ -124,8 +124,7 @@ public class VirtualBattleGridService implements IGridServiceProvider, IVirtualB
         double energyPerDrop = baseEnergy * energyMultiplier;
         boolean anyInserted = false;
 
-        boolean globalVoidSecondary = upgrades.isInstalled(ModItems.VOID_SECONDARY_CARD.get())
-                || upgrades.isInstalled(AEItems.VOID_CARD.asItem());
+        boolean globalVoidSecondary = de.project.ae2virtualbattle.util.VirtualCellAdapter.hasVoidSecondaryCard(upgrades);
 
         for (int c = 0; c < dropCycles; c++) {
             if (battleCell.isFull() || battleCell.getStatus() == CellState.FULL) {

@@ -1,19 +1,22 @@
 package de.project.ae2virtualbattle.network;
 
 import de.project.ae2virtualbattle.AE2VirtualBattle;
-import de.project.ae2virtualbattle.cell.partition.BattleCellPartitionList;
+import de.project.ae2virtualbattle.util.VirtualCellAdapter.UniversalPartition;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record SetPartitionsPayload(BattleCellPartitionList partitions) implements CustomPacketPayload {
+import java.util.List;
+
+public record SetPartitionsPayload(List<UniversalPartition> partitions) implements CustomPacketPayload {
     public static final Type<SetPartitionsPayload> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath(AE2VirtualBattle.MODID, "set_partitions"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SetPartitionsPayload> STREAM_CODEC =
             StreamCodec.composite(
-                    BattleCellPartitionList.STREAM_CODEC,
+                    UniversalPartition.STREAM_CODEC.apply(ByteBufCodecs.list()),
                     SetPartitionsPayload::partitions,
                     SetPartitionsPayload::new
             );
