@@ -123,7 +123,7 @@ public class VirtualBattleGridService implements IGridServiceProvider, IVirtualB
             return false;
         }
 
-        double baseEnergy = VirtualBattleConfig.ENERGY_PER_DROP.get();
+        double baseEnergy = VirtualBattleConfig.SPEC.isLoaded() ? VirtualBattleConfig.ENERGY_PER_DROP.get() : 10.0;
         double energyMultiplier = Math.pow(1.5, speedCards);
         double energyPerDrop = baseEnergy * energyMultiplier;
         boolean anyInserted = false;
