@@ -1,20 +1,14 @@
 package de.project.ae2virtualbattle.menu;
 
 import appeng.api.ids.AEComponents;
-import appeng.api.stacks.AEItemKey;
-import appeng.api.stacks.GenericStack;
 import appeng.api.upgrades.UpgradeInventories;
 import appeng.core.definitions.AEItems;
-import de.project.ae2virtualbattle.cell.VirtualBattleCellItem;
-import de.project.ae2virtualbattle.cell.partition.BattleCellPartition;
-import de.project.ae2virtualbattle.cell.partition.BattleCellPartitionList;
-import de.project.ae2virtualbattle.config.VirtualBattleConfig;
-import de.project.ae2virtualbattle.recipe.BattleDropRegistry;
 import de.project.ae2virtualbattle.registry.ModBlocks;
-import de.project.ae2virtualbattle.registry.ModDataComponents;
-import de.project.ae2virtualbattle.registry.ModItems;
 import de.project.ae2virtualbattle.registry.ModMenus;
+import de.project.ae2virtualbattle.util.VirtualCellAdapter;
+import de.project.ae2virtualbattle.util.VirtualCellAdapter.UniversalPartition;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -24,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -33,13 +26,13 @@ import java.util.List;
 import java.util.Set;
 
 public class VirtualPartitionerMenu extends AbstractContainerMenu {
+
     private final Container container;
     private final ContainerLevelAccess access;
-
-    private boolean loadingUpgrades = false;
     private ItemStack lastCellInSlot0 = ItemStack.EMPTY;
+    private boolean loadingUpgrades = false;
 
-    private final SimpleContainer upgradeContainer = new SimpleContainer(5) {
+    public final Container upgradeContainer = new SimpleContainer(5) {
         @Override
         public void setChanged() {
             super.setChanged();
@@ -56,6 +49,10 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
                         ContainerLevelAccess.NULL);
     }
 
+    public VirtualPartitionerMenu(int containerId, Inventory playerInventory) {
+        this(containerId, playerInventory, new SimpleContainer(1), ContainerLevelAccess.NULL);
+    }
+
     public VirtualPartitionerMenu(int containerId, Inventory playerInventory, Container container, ContainerLevelAccess access) {
         super(ModMenus.PARTITIONER_MENU.get(), containerId);
         checkContainerSize(container, 1);
@@ -67,7 +64,7 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
         this.addSlot(new Slot(container, 0, 16, 20) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return stack.getItem() instanceof VirtualBattleCellItem;
+                return VirtualCellAdapter.isVirtualStorageCell(stack);
             }
 
             @Override
@@ -114,8 +111,7 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
         this.addSlot(new Slot(this.upgradeContainer, 4, 138, 155) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                return !container.getItem(0).isEmpty() && (stack.is(ModItems.VOID_SECONDARY_CARD.get())
-                        || stack.is(AEItems.VOID_CARD.asItem()));
+                return !container.getItem(0).isEmpty() && VirtualCellAdapter.isVoidSecondaryCard(stack);
             }
 
             @Override
@@ -152,7 +148,7 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
         try {
             upgradeContainer.clearContent();
             ItemStack cell = container.getItem(0);
-            if (!cell.isEmpty() && cell.getItem() instanceof VirtualBattleCellItem) {
+            if (!cell.isEmpty() && VirtualCellAdapter.isVirtualStorageCell(cell)) {
                 var inv = UpgradeInventories.forItem(cell, 5);
                 int speedIdx = 0;
                 for (int i = 0; i < inv.size(); i++) {
@@ -162,8 +158,7 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
                         if (speedIdx < 4) {
                             upgradeContainer.setItem(speedIdx++, upgrade.copyWithCount(1));
                         }
-                    } else if (upgrade.is(ModItems.VOID_SECONDARY_CARD.get())
-                            || upgrade.is(AEItems.VOID_CARD.asItem())) {
+                    } else if (VirtualCellAdapter.isVoidSecondaryCard(upgrade)) {
                         upgradeContainer.setItem(4, upgrade.copyWithCount(1));
                     }
                 }
@@ -175,7 +170,7 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
 
     private void saveUpgradesToCell() {
         ItemStack cell = container.getItem(0);
-        if (!cell.isEmpty() && cell.getItem() instanceof VirtualBattleCellItem) {
+        if (!cell.isEmpty() && VirtualCellAdapter.isVirtualStorageCell(cell)) {
             List<ItemStack> list = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 ItemStack stack = upgradeContainer.getItem(i);
@@ -204,6 +199,12 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return stillValid(this.access, player, ModBlocks.VIRTUAL_PARTITIONER.get());
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        this.container.stopOpen(player);
     }
 
     @Override
@@ -236,7 +237,7 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
                 }
             } else {
                 // From inventory / hotbar (index >= 6)
-                if (stackInSlot.getItem() instanceof VirtualBattleCellItem) {
+                if (VirtualCellAdapter.isVirtualStorageCell(stackInSlot)) {
                     if (!this.moveItemStackTo(stackInSlot, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
@@ -253,8 +254,7 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
                             }
                         }
                     }
-                } else if (stackInSlot.is(ModItems.VOID_SECONDARY_CARD.get())
-                        || stackInSlot.is(AEItems.VOID_CARD.asItem())) {
+                } else if (VirtualCellAdapter.isVoidSecondaryCard(stackInSlot)) {
                     // Try moving to void slot (5..6)
                     if (!this.moveItemStackTo(stackInSlot, 5, 6, false)) {
                         if (index >= 6 && index < 33) {
@@ -279,7 +279,7 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
             }
 
             if (stackInSlot.isEmpty()) {
-                slot.setByPlayer(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
                 slot.setChanged();
             }
@@ -294,72 +294,54 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
         return itemstack;
     }
 
-    @Override
-    public void removed(Player player) {
-        super.removed(player);
-        this.container.stopOpen(player);
-    }
-
-    public void applyPartitions(Player player, BattleCellPartitionList newPartitions) {
+    public void applyPartitions(Player player, List<UniversalPartition> newPartitions) {
         Slot cellSlot = this.slots.get(0);
         if (cellSlot == null || !cellSlot.hasItem()) {
             return;
         }
         ItemStack cellStack = cellSlot.getItem();
-        if (!(cellStack.getItem() instanceof VirtualBattleCellItem)) {
+        if (!VirtualCellAdapter.isVirtualStorageCell(cellStack)) {
             return;
         }
 
         if (newPartitions == null || newPartitions.isEmpty()) {
-            cellStack.remove(ModDataComponents.PARTITIONS.get());
-            cellStack.remove(AEComponents.STORAGE_CELL_CONFIG_INV);
+            VirtualCellAdapter.writePartitions(cellStack, List.of());
             cellSlot.setChanged();
             broadcastChanges();
             return;
         }
 
         // Validate
-        List<BattleCellPartition> validList = new ArrayList<>();
-        Set<Item> seen = new HashSet<>();
+        List<UniversalPartition> validList = new ArrayList<>();
+        Set<ResourceLocation> seen = new HashSet<>();
         int totalPercent = 0;
+        boolean voidCardInstalled = VirtualCellAdapter.hasVoidCardInstalled(this.upgradeContainer, cellStack);
+        boolean isFluid = VirtualCellAdapter.isFluidCell(cellStack);
 
-        for (BattleCellPartition p : newPartitions.partitions()) {
-            if (p == null || p.target() == null || p.percent() <= 0) continue;
-            if (!seen.add(p.target())) continue; // No duplicates
-            if (!BattleDropRegistry.isValidBattleTarget(p.target(), player.level())) continue;
-
-            if (VirtualBattleConfig.SPEC.isLoaded() && VirtualBattleConfig.ENFORCE_INVENTORY_CHECK.get() && !player.isCreative()) {
-                if (!hasItemInInventory(player, p.target())) {
-                    continue;
-                }
-            }
+        for (UniversalPartition p : newPartitions) {
+            if (p == null || p.targetId() == null || p.percent() <= 0) continue;
+            if (!seen.add(p.targetId())) continue; // No duplicates
+            if (!VirtualCellAdapter.isValidTarget(cellStack, p.targetId(), player.level())) continue;
 
             totalPercent += p.percent();
-            validList.add(p);
+            boolean voidSec = voidCardInstalled && p.voidSecondary();
+            validList.add(new UniversalPartition(p.targetId(), isFluid, p.percent(), voidSec));
         }
 
         if (totalPercent > 100) {
             int sum = 0;
-            List<BattleCellPartition> adjusted = new ArrayList<>();
-            for (BattleCellPartition p : validList) {
+            List<UniversalPartition> adjusted = new ArrayList<>();
+            for (UniversalPartition p : validList) {
                 int allowed = Math.min(p.percent(), 100 - sum);
                 if (allowed > 0) {
-                    adjusted.add(new BattleCellPartition(p.target(), allowed, p.voidSecondary()));
+                    adjusted.add(new UniversalPartition(p.targetId(), p.isFluid(), allowed, p.voidSecondary()));
                     sum += allowed;
                 }
             }
             validList = adjusted;
         }
 
-        if (validList.isEmpty()) {
-            cellStack.remove(ModDataComponents.PARTITIONS.get());
-            cellStack.remove(AEComponents.STORAGE_CELL_CONFIG_INV);
-        } else {
-            cellStack.set(ModDataComponents.PARTITIONS.get(), new BattleCellPartitionList(validList));
-            // Keep AE2 config synced with primary target for GUI compatibility
-            cellStack.set(AEComponents.STORAGE_CELL_CONFIG_INV,
-                    List.of(new GenericStack(AEItemKey.of(validList.get(0).target()), 1)));
-        }
+        VirtualCellAdapter.writePartitions(cellStack, validList);
 
         cellSlot.setChanged();
         broadcastChanges();
@@ -368,16 +350,5 @@ public class VirtualPartitionerMenu extends AbstractContainerMenu {
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 1.2f);
         }
-    }
-
-    private static boolean hasItemInInventory(Player player, Item item) {
-        if (player.isCreative()) return true;
-        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            ItemStack stack = player.getInventory().getItem(i);
-            if (!stack.isEmpty() && stack.is(item)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
