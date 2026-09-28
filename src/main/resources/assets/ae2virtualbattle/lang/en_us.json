@@ -1,20 +1,32 @@
 {
   "itemGroup.ae2virtualbattle": "AE2 Virtual Battle",
+
+  "block.ae2virtualbattle.virtual_partitioner": "Virtual Partitioner",
+  "gui.ae2virtualbattle.virtual_partitioner": "Virtual Partitioner",
+  "item.ae2virtualbattle.void_secondary_card": "Void Secondary Output Card",
+
   "item.ae2virtualbattle.battle_cell_housing": "Virtual Battle Cell Housing",
   "item.ae2virtualbattle.battle_cell_component_1k": "1k Virtual Battle Storage Component",
   "item.ae2virtualbattle.battle_cell_component_4k": "4k Virtual Battle Storage Component",
   "item.ae2virtualbattle.battle_cell_component_16k": "16k Virtual Battle Storage Component",
   "item.ae2virtualbattle.battle_cell_component_64k": "64k Virtual Battle Storage Component",
   "item.ae2virtualbattle.battle_cell_component_256k": "256k Virtual Battle Storage Component",
+
   "item.ae2virtualbattle.battle_storage_cell_1k": "1k Virtual Battle Storage Cell",
   "item.ae2virtualbattle.battle_storage_cell_4k": "4k Virtual Battle Storage Cell",
   "item.ae2virtualbattle.battle_storage_cell_16k": "16k Virtual Battle Storage Cell",
   "item.ae2virtualbattle.battle_storage_cell_64k": "64k Virtual Battle Storage Cell",
   "item.ae2virtualbattle.battle_storage_cell_256k": "256k Virtual Battle Storage Cell",
+
   "tooltip.ae2virtualbattle.tier": "Tier: %s",
   "tooltip.ae2virtualbattle.production": "Produces %s drop(s) every %s seconds",
+  "tooltip.ae2virtualbattle.production_speed": "Produces %s drop(s) every %s seconds (%s Acceleration Cards)",
   "tooltip.ae2virtualbattle.configured_target": "Target Mob: %s",
-  "tooltip.ae2virtualbattle.not_configured": "Unpartitioned (Partition in Cell Workbench or Shift+Right Click with Mob Drop in Off-hand)",
+  "tooltip.ae2virtualbattle.void_secondary_active": "◆ Void Secondary Outputs: Active",
+  "tooltip.ae2virtualbattle.partitions_header": "Partitions (%s):",
+  "tooltip.ae2virtualbattle.not_configured": "Unpartitioned (Partition in Virtual Partitioner or Cell Workbench)",
+
   "message.ae2virtualbattle.configured": "Virtual Battle Cell configured for: %s",
-  "message.ae2virtualbattle.cleared": "Virtual Battle Cell configuration cleared"
+  "message.ae2virtualbattle.cleared": "Virtual Battle Cell configuration cleared",
+  "message.ae2virtualbattle.clear_blocked": "Cannot clear configuration while cell contains items! Empty cell first."
 }

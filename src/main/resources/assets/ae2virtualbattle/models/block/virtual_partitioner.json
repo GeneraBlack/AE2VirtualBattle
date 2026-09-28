@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "top": "ae2virtualbattle:block/virtual_partitioner_top",
+    "front": "ae2virtualbattle:block/virtual_partitioner_front",
+    "side": "ae2virtualbattle:block/virtual_partitioner_side",
+    "bottom": "ae2virtualbattle:block/virtual_partitioner_bottom"
+  }
+}

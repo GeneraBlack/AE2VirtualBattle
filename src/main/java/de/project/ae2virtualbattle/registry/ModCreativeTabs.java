@@ -28,6 +28,8 @@ public class ModCreativeTabs {
                         output.accept(ModItems.BATTLE_CELL_16K.get());
                         output.accept(ModItems.BATTLE_CELL_64K.get());
                         output.accept(ModItems.BATTLE_CELL_256K.get());
+                        output.accept(ModItems.VOID_SECONDARY_CARD.get());
+                        output.accept(ModItems.VIRTUAL_PARTITIONER.get());
                     })
                     .build());
 }

@@ -37,4 +37,12 @@ public class ModItems {
             ITEMS.register("battle_storage_cell_64k", () -> new VirtualBattleCellItem(BattleCellTier.TIER_64K, new Item.Properties()));
     public static final DeferredHolder<Item, VirtualBattleCellItem> BATTLE_CELL_256K =
             ITEMS.register("battle_storage_cell_256k", () -> new VirtualBattleCellItem(BattleCellTier.TIER_256K, new Item.Properties()));
+
+    // Upgrade Cards
+    public static final DeferredHolder<Item, Item> VOID_SECONDARY_CARD =
+            ITEMS.register("void_secondary_card", () -> appeng.api.upgrades.Upgrades.createUpgradeCardItem(new Item.Properties()));
+
+    // Blocks
+    public static final DeferredHolder<Item, net.minecraft.world.item.BlockItem> VIRTUAL_PARTITIONER =
+            ITEMS.registerSimpleBlockItem("virtual_partitioner", ModBlocks.VIRTUAL_PARTITIONER);
 }
