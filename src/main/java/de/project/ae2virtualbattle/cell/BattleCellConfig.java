@@ -91,6 +91,7 @@ public class BattleCellConfig {
 
         public void save() {
             this.stack.set(AEComponents.STORAGE_CELL_CONFIG_INV, this.inv.toList());
+            this.stack.remove(de.project.ae2virtualbattle.registry.ModDataComponents.PARTITIONS.get());
         }
     }
 

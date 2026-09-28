@@ -114,6 +114,6 @@ public class VirtualPartitionerBlockEntity extends BlockEntity implements MenuPr
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        return slot == 0 && stack.getItem() instanceof VirtualBattleCellItem;
+        return slot == 0 && de.project.ae2virtualbattle.util.VirtualCellAdapter.isVirtualStorageCell(stack);
     }
 }

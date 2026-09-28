@@ -19,7 +19,6 @@ import de.project.ae2virtualbattle.cell.partition.BattleCellPartitionList;
 import de.project.ae2virtualbattle.config.VirtualBattleConfig;
 import de.project.ae2virtualbattle.recipe.BattleDropEntry;
 import de.project.ae2virtualbattle.recipe.BattleDropRegistry;
-import de.project.ae2virtualbattle.registry.ModItems;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -52,7 +51,7 @@ public class VirtualBattleGridService implements IGridServiceProvider, IVirtualB
         }
 
         IEnergyService energyService = grid.getEnergyService();
-        boolean requireEnergy = VirtualBattleConfig.REQUIRE_AE_ENERGY.get();
+        boolean requireEnergy = (VirtualBattleConfig.SPEC.isLoaded() ? VirtualBattleConfig.REQUIRE_AE_ENERGY.get() : true);
         if (requireEnergy && !energyService.isNetworkPowered()) {
             return;
         }
@@ -87,7 +86,7 @@ public class VirtualBattleGridService implements IGridServiceProvider, IVirtualB
     private boolean tickCell(IVirtualBattleCell battleCell, Level level, IEnergyService energyService, boolean requireEnergy, RandomSource random) {
         IUpgradeInventory upgrades = UpgradeInventories.forItem(battleCell.getItemStack(), 5);
         int speedCards = Math.min(4, upgrades.getInstalledUpgrades(AEItems.SPEED_CARD.asItem()));
-        int baseInterval = VirtualBattleConfig.BASE_TICK_INTERVAL.get();
+        int baseInterval = (VirtualBattleConfig.SPEC.isLoaded() ? VirtualBattleConfig.BASE_TICK_INTERVAL.get() : 100);
 
         int targetInterval = switch (speedCards) {
             case 1 -> (int) (baseInterval * 0.70);
@@ -175,7 +174,7 @@ public class VirtualBattleGridService implements IGridServiceProvider, IVirtualB
                 continue;
             }
 
-            boolean voidThisSecondary = globalVoidSecondary || selectedPartition.voidSecondary();
+            boolean voidThisSecondary = globalVoidSecondary && selectedPartition.voidSecondary();
 
             // A drop is secondary if its entry index > 0 (not the primary drop)
             if (voidThisSecondary && rolledDrop.isSecondary()) {
