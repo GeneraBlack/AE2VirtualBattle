@@ -18,7 +18,6 @@ import appeng.util.ConfigInventory;
 import de.project.ae2virtualbattle.config.VirtualBattleConfig;
 import de.project.ae2virtualbattle.recipe.BattleDropRegistry;
 import de.project.ae2virtualbattle.registry.ModDataComponents;
-import de.project.ae2virtualbattle.registry.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -98,7 +97,7 @@ public class VirtualBattleCellItem extends Item implements ICellWorkbenchItem {
 
         IUpgradeInventory upgrades = getUpgrades(stack);
         int speedCards = Math.min(4, upgrades.getInstalledUpgrades(AEItems.SPEED_CARD.asItem()));
-        int baseInterval = VirtualBattleConfig.BASE_TICK_INTERVAL.get();
+        int baseInterval = VirtualBattleConfig.SPEC.isLoaded() ? VirtualBattleConfig.BASE_TICK_INTERVAL.get() : 100;
         int intervalTicks = switch (speedCards) {
             case 1 -> (int) (baseInterval * 0.70);
             case 2 -> (int) (baseInterval * 0.45);

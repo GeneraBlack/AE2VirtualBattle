@@ -337,7 +337,7 @@ public class BattleDropRegistry {
         if (hasBattleTag(item)) {
             return true;
         }
-        if (VirtualBattleConfig.ENABLE_DYNAMIC_FALLBACK.get()) {
+        if (VirtualBattleConfig.SPEC.isLoaded() && VirtualBattleConfig.ENABLE_DYNAMIC_FALLBACK.get()) {
             if (item instanceof SpawnEggItem) {
                 return true;
             }
@@ -402,7 +402,7 @@ public class BattleDropRegistry {
         }
 
         // 4. Dynamic fallback (only if enabled and target is an unknown spawn egg)
-        if (VirtualBattleConfig.ENABLE_DYNAMIC_FALLBACK.get()) {
+        if (VirtualBattleConfig.SPEC.isLoaded() && VirtualBattleConfig.ENABLE_DYNAMIC_FALLBACK.get()) {
             if (target instanceof SpawnEggItem || BuiltInRegistries.ITEM.getKey(target).getPath().contains("spawn_egg")) {
                 List<BattleDropEntry> fallback = List.of(new BattleDropEntry(new ItemStack(Items.ROTTEN_FLESH), 100, 1, 2));
                 DYNAMIC_CACHE.put(target, fallback);

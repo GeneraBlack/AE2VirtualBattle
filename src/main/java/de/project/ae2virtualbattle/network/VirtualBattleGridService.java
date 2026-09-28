@@ -40,9 +40,16 @@ public class VirtualBattleGridService implements IGridServiceProvider, IVirtualB
         this.grid = grid;
     }
 
+    private int tickCounter = 0;
+    
     @Override
     public void onLevelEndTick(Level level) {
         if (level.isClientSide()) {
+            return;
+        }
+
+        tickCounter++;
+        if (tickCounter % 5 != 0) {
             return;
         }
 
@@ -169,7 +176,7 @@ public class VirtualBattleGridService implements IGridServiceProvider, IVirtualB
                 continue;
             }
 
-            boolean voidThisSecondary = globalVoidSecondary || selectedPartition.voidSecondary();
+            boolean voidThisSecondary = globalVoidSecondary && selectedPartition.voidSecondary();
 
             // A drop is secondary if its entry index > 0 (not the primary drop)
             if (voidThisSecondary && rolledDrop.isSecondary()) {

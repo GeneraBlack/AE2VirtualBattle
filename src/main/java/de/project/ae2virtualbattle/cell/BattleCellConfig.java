@@ -42,7 +42,7 @@ public class BattleCellConfig {
         }
 
         // 2. Inventory check (if enabled): Player must actually possess the item
-        if (VirtualBattleConfig.ENFORCE_INVENTORY_CHECK.get()) {
+        if (VirtualBattleConfig.SPEC.isLoaded() && VirtualBattleConfig.ENFORCE_INVENTORY_CHECK.get()) {
             Player player = findPlayerInteractingWith(cellStack);
             if (player != null && !player.isCreative()) {
                 boolean hasItem = player.getInventory().contains(s -> s.is(itemKey.getItem()))
@@ -91,6 +91,7 @@ public class BattleCellConfig {
 
         public void save() {
             this.stack.set(AEComponents.STORAGE_CELL_CONFIG_INV, this.inv.toList());
+            this.stack.remove(de.project.ae2virtualbattle.registry.ModDataComponents.PARTITIONS.get());
         }
     }
 

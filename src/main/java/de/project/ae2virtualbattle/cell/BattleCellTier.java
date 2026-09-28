@@ -44,6 +44,15 @@ public enum BattleCellTier {
     }
 
     public int getDropCount() {
+        if (!VirtualBattleConfig.SPEC.isLoaded()) {
+            return switch (this) {
+                case TIER_1K -> 1;
+                case TIER_4K -> 2;
+                case TIER_16K -> 3;
+                case TIER_64K -> 4;
+                case TIER_256K -> 5;
+            };
+        }
         return switch (this) {
             case TIER_1K -> VirtualBattleConfig.TIER_1K_DROPS.get();
             case TIER_4K -> VirtualBattleConfig.TIER_4K_DROPS.get();
