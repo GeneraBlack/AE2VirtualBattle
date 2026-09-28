@@ -6,8 +6,13 @@ import de.project.ae2virtualbattle.cell.VirtualBattleCellHandler;
 import de.project.ae2virtualbattle.config.VirtualBattleConfig;
 import de.project.ae2virtualbattle.network.IVirtualBattleGridService;
 import de.project.ae2virtualbattle.network.VirtualBattleGridService;
+import de.project.ae2virtualbattle.network.VirtualPartitionerNetworking;
+import de.project.ae2virtualbattle.registry.ModBlockEntities;
+import de.project.ae2virtualbattle.registry.ModBlocks;
 import de.project.ae2virtualbattle.registry.ModCreativeTabs;
+import de.project.ae2virtualbattle.registry.ModDataComponents;
 import de.project.ae2virtualbattle.registry.ModItems;
+import de.project.ae2virtualbattle.registry.ModMenus;
 import de.project.ae2virtualbattle.registry.ModRecipes;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -29,21 +34,32 @@ public class AE2VirtualBattle {
         modContainer.registerConfig(ModConfig.Type.COMMON, VirtualBattleConfig.SPEC);
 
         // Register Registries
+        ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
+        ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+        ModMenus.MENUS.register(modEventBus);
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
         ModRecipes.SERIALIZERS.register(modEventBus);
         ModRecipes.RECIPE_TYPES.register(modEventBus);
+        ModDataComponents.DATA_COMPONENTS.register(modEventBus);
 
         // Register Grid Service during mod init
         GridServices.register(IVirtualBattleGridService.class, VirtualBattleGridService.class);
 
         // Register Setup Listener
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(VirtualPartitionerNetworking::onRegisterPayloadHandlers);
+        if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
+            modEventBus.addListener(de.project.ae2virtualbattle.client.VirtualPartitionerClient::onRegisterMenuScreens);
+        }
 
-        // Clear dynamic recipe cache on datapack reload
-        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.OnDatapackSyncEvent event) -> {
-            if (event.getPlayer() == null) {
-                de.project.ae2virtualbattle.recipe.BattleDropRegistry.clearCache();
+        // Refresh recipe cache and clear dynamic cache when tags/datapacks update
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.TagsUpdatedEvent event) -> {
+            de.project.ae2virtualbattle.recipe.BattleDropRegistry.clearCache();
+            var server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();
+            if (server != null) {
+                de.project.ae2virtualbattle.recipe.BattleDropRegistry.refreshRecipeCache(server.getRecipeManager());
+                LOGGER.info("AE2 Virtual Battle: Refreshed recipe cache");
             }
         });
     }
@@ -52,6 +68,19 @@ public class AE2VirtualBattle {
         event.enqueueWork(() -> {
             LOGGER.info("Registering AE2 Virtual Battle Storage Cell Handler");
             StorageCells.addCellHandler(new VirtualBattleCellHandler());
+
+            // Register Upgrades on all Battle Storage Cells
+            for (var cell : java.util.List.of(
+                    ModItems.BATTLE_CELL_1K,
+                    ModItems.BATTLE_CELL_4K,
+                    ModItems.BATTLE_CELL_16K,
+                    ModItems.BATTLE_CELL_64K,
+                    ModItems.BATTLE_CELL_256K
+            )) {
+                appeng.api.upgrades.Upgrades.add(appeng.core.definitions.AEItems.SPEED_CARD.asItem(), cell.get(), 4);
+                appeng.api.upgrades.Upgrades.add(ModItems.VOID_SECONDARY_CARD.get(), cell.get(), 1);
+                appeng.api.upgrades.Upgrades.add(appeng.core.definitions.AEItems.VOID_CARD.asItem(), cell.get(), 1);
+            }
         });
     }
 }

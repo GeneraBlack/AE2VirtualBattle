@@ -3,6 +3,7 @@ package de.project.ae2virtualbattle.registry;
 import de.project.ae2virtualbattle.AE2VirtualBattle;
 import de.project.ae2virtualbattle.cell.BattleCellTier;
 import de.project.ae2virtualbattle.cell.VirtualBattleCellItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -37,4 +38,10 @@ public class ModItems {
             ITEMS.registerItem("battle_storage_cell_64k", props -> new VirtualBattleCellItem(BattleCellTier.TIER_64K, props));
     public static final DeferredItem<VirtualBattleCellItem> BATTLE_CELL_256K =
             ITEMS.registerItem("battle_storage_cell_256k", props -> new VirtualBattleCellItem(BattleCellTier.TIER_256K, props));
+
+    // Upgrades & Blocks
+    public static final DeferredItem<Item> VOID_SECONDARY_CARD =
+            ITEMS.registerSimpleItem("void_secondary_card");
+    public static final DeferredItem<BlockItem> VIRTUAL_PARTITIONER =
+            ITEMS.registerSimpleBlockItem("virtual_partitioner", ModBlocks.VIRTUAL_PARTITIONER);
 }

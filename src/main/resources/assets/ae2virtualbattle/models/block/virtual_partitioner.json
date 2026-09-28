@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "ae2virtualbattle:block/virtual_partitioner_bottom",
+    "up": "ae2virtualbattle:block/virtual_partitioner_top",
+    "north": "ae2virtualbattle:block/virtual_partitioner_front",
+    "south": "ae2virtualbattle:block/virtual_partitioner_side",
+    "west": "ae2virtualbattle:block/virtual_partitioner_side",
+    "east": "ae2virtualbattle:block/virtual_partitioner_side",
+    "particle": "ae2virtualbattle:block/virtual_partitioner_front"
+  }
+}

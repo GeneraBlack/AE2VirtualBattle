@@ -1,5 +1,6 @@
 package de.project.ae2virtualbattle.recipe;
 
+import de.project.ae2virtualbattle.cell.BattleCellTier;
 import de.project.ae2virtualbattle.config.VirtualBattleConfig;
 import de.project.ae2virtualbattle.registry.ModRecipes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -30,6 +32,28 @@ public class BattleDropRegistry {
 
     private static final Map<Item, List<BattleDropEntry>> BUILTIN_DROPS = new HashMap<>();
     private static final Map<Item, List<BattleDropEntry>> DYNAMIC_CACHE = new HashMap<>();
+    private static final Map<Item, BattleDropRecipe> RECIPE_CACHE = new HashMap<>();
+
+    public static void clearCache() {
+        DYNAMIC_CACHE.clear();
+        RECIPE_CACHE.clear();
+    }
+
+    public static void refreshRecipeCache(net.minecraft.world.item.crafting.RecipeManager recipeManager) {
+        RECIPE_CACHE.clear();
+        for (RecipeHolder<?> holder : recipeManager.getRecipes()) {
+            if (holder.value() instanceof BattleDropRecipe recipe) {
+                recipe.target().items().forEach(itemHolder -> {
+                    RECIPE_CACHE.put(itemHolder.value(), recipe);
+                });
+            }
+        }
+    }
+
+    @Nullable
+    private static BattleDropRecipe getCachedRecipe(Item target) {
+        return RECIPE_CACHE.get(target);
+    }
 
     static {
         registerHostileDefaults();
@@ -325,18 +349,45 @@ public class BattleDropRegistry {
     }
 
     public static List<BattleDropEntry> getDropEntries(Item target, Level level) {
+        return getDropEntries(target, level, null);
+    }
+
+    public static List<BattleDropEntry> getDropEntries(Item target, @Nullable Level level, @Nullable BattleCellTier tier) {
+        if (target == null || target.equals(Items.AIR)) {
+            return Collections.emptyList();
+        }
+
         // 1. Check custom datapack recipes first (allows overriding built-in defaults)
         if (level != null) {
             RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : (level.getServer() != null ? level.getServer().getRecipeManager() : null);
             if (recipeManager != null) {
                 SingleRecipeInput input = new SingleRecipeInput(new ItemStack(target));
-                Optional<RecipeHolder<BattleDropRecipe>> recipe = recipeManager
+                Optional<RecipeHolder<BattleDropRecipe>> recipeMatch = recipeManager
                         .getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level);
-                if (recipe.isPresent()) {
-                    List<BattleDropEntry> drops = recipe.get().value().drops();
+                if (recipeMatch.isPresent()) {
+                    BattleDropRecipe recipe = recipeMatch.get().value();
+                    if (tier != null) {
+                        int cellTierNumber = tier.ordinal() + 1;
+                        if (cellTierNumber < recipe.minTier()) {
+                            return Collections.emptyList();
+                        }
+                    }
+                    List<BattleDropEntry> drops = recipe.drops();
                     DYNAMIC_CACHE.put(target, drops);
                     return drops;
                 }
+            }
+        } else {
+            // BUG-07 FIX: Use recipe cache when Level is unavailable
+            BattleDropRecipe cached = getCachedRecipe(target);
+            if (cached != null) {
+                if (tier != null) {
+                    int cellTierNumber = tier.ordinal() + 1;
+                    if (cellTierNumber < cached.minTier()) {
+                        return Collections.emptyList();
+                    }
+                }
+                return cached.drops();
             }
         }
 
@@ -359,16 +410,28 @@ public class BattleDropRegistry {
             }
         }
 
-        return List.of();
+        return Collections.emptyList();
     }
 
-    public static void clearCache() {
-        DYNAMIC_CACHE.clear();
+    /**
+     * Result of a weighted drop roll, including which entry index was selected.
+     */
+    public record RolledDrop(ItemStack stack, int entryIndex) {
+        public static final RolledDrop EMPTY = new RolledDrop(ItemStack.EMPTY, -1);
+
+        public boolean isSecondary() {
+            return entryIndex > 0;
+        }
     }
 
     public static ItemStack rollDrop(List<BattleDropEntry> entries, RandomSource random) {
+        RolledDrop result = rollDropWithIndex(entries, random);
+        return result.stack();
+    }
+
+    public static RolledDrop rollDropWithIndex(List<BattleDropEntry> entries, RandomSource random) {
         if (entries == null || entries.isEmpty()) {
-            return ItemStack.EMPTY;
+            return RolledDrop.EMPTY;
         }
 
         int totalWeight = 0;
@@ -377,12 +440,13 @@ public class BattleDropRegistry {
         }
 
         if (totalWeight <= 0) {
-            return ItemStack.EMPTY;
+            return RolledDrop.EMPTY;
         }
 
         int roll = random.nextInt(totalWeight);
         int current = 0;
-        for (BattleDropEntry entry : entries) {
+        for (int i = 0; i < entries.size(); i++) {
+            BattleDropEntry entry = entries.get(i);
             current += entry.weight();
             if (roll < current) {
                 int min = entry.minCount();
@@ -390,10 +454,10 @@ public class BattleDropRegistry {
                 int count = (min >= max) ? min : (min + random.nextInt(max - min + 1));
                 ItemStack result = entry.createStack();
                 result.setCount(count);
-                return result;
+                return new RolledDrop(result, i);
             }
         }
 
-        return ItemStack.EMPTY;
+        return RolledDrop.EMPTY;
     }
 }
