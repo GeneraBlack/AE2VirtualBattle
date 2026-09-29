@@ -45,7 +45,7 @@ public interface IVirtualBattleCell extends StorageCell {
         }
         Item single = getConfiguredTarget();
         if (single != null) {
-            return new BattleCellPartitionList(List.of(new BattleCellPartition(single, 100, false)));
+            return new BattleCellPartitionList(List.of(new BattleCellPartition(single, 100, true)));
         }
         return BattleCellPartitionList.EMPTY;
     }
