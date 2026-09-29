@@ -360,24 +360,22 @@ public class BattleDropRegistry {
         }
 
         // 1. Check custom datapack recipes first (allows overriding built-in defaults)
-        if (level != null) {
-            RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : (level.getServer() != null ? level.getServer().getRecipeManager() : null);
-            if (recipeManager != null) {
-                SingleRecipeInput input = new SingleRecipeInput(new ItemStack(target));
-                Optional<RecipeHolder<BattleDropRecipe>> recipeMatch = recipeManager
-                        .getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level);
-                if (recipeMatch.isPresent()) {
-                    BattleDropRecipe recipe = recipeMatch.get().value();
-                    if (tier != null) {
-                        int cellTierNumber = tier.ordinal() + 1;
-                        if (cellTierNumber < recipe.minTier()) {
-                            return Collections.emptyList();
-                        }
+        if (level != null && level.getServer() != null) {
+            RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : level.getServer().getRecipeManager();
+            SingleRecipeInput input = new SingleRecipeInput(new ItemStack(target));
+            Optional<RecipeHolder<BattleDropRecipe>> recipeMatch = recipeManager
+                    .getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level);
+            if (recipeMatch.isPresent()) {
+                BattleDropRecipe recipe = recipeMatch.get().value();
+                if (tier != null) {
+                    int cellTierNumber = tier.ordinal() + 1;
+                    if (cellTierNumber < recipe.minTier()) {
+                        return Collections.emptyList();
                     }
-                    List<BattleDropEntry> drops = recipe.drops();
-                    DYNAMIC_CACHE.put(target, drops);
-                    return drops;
                 }
+                List<BattleDropEntry> drops = recipe.drops();
+                DYNAMIC_CACHE.put(target, drops);
+                return drops;
             }
         } else {
             // BUG-07 FIX: Use recipe cache when Level is unavailable
