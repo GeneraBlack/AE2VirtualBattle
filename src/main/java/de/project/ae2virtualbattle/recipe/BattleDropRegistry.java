@@ -55,10 +55,16 @@ public class BattleDropRegistry {
         return RECIPE_CACHE.get(target);
     }
 
-    static {
+    private static volatile boolean initialized = false;
+
+    public static void ensureInitialized() {
+        if (!initialized) {
+            initialized = true;
         registerHostileDefaults();
         registerPassiveDefaults();
         registerBossDefaults();
+    
+        }
     }
 
     private static void registerHostileDefaults() {
@@ -322,6 +328,7 @@ public class BattleDropRegistry {
     }
 
     public static boolean isValidBattleTarget(Item item, Level level) {
+        ensureInitialized();
         if (level != null && level.getServer() != null) {
             RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : level.getServer().getRecipeManager();
             SingleRecipeInput input = new SingleRecipeInput(new ItemStack(item));
@@ -351,10 +358,12 @@ public class BattleDropRegistry {
     }
 
     public static List<BattleDropEntry> getDropEntries(Item target, Level level) {
+        ensureInitialized();
         return getDropEntries(target, level, null);
     }
 
     public static List<BattleDropEntry> getDropEntries(Item target, @Nullable Level level, @Nullable BattleCellTier tier) {
+        ensureInitialized();
         if (target == null || target.equals(Items.AIR)) {
             return Collections.emptyList();
         }
