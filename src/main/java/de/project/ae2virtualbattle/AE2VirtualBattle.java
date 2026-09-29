@@ -55,7 +55,6 @@ public class AE2VirtualBattle {
 
         // Refresh recipe cache and clear dynamic cache when tags/datapacks update
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.TagsUpdatedEvent event) -> {
-            de.project.ae2virtualbattle.recipe.BattleDropRegistry.ensureInitialized();
             de.project.ae2virtualbattle.recipe.BattleDropRegistry.clearCache();
             var server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();
             if (server != null) {
