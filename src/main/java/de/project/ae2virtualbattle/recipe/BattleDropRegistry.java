@@ -326,8 +326,12 @@ public class BattleDropRegistry {
             if (level.getRecipeManager().getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level).isPresent()) {
                 return true;
             }
+        } else {
+            if (RECIPE_CACHE.containsKey(item)) {
+                return true;
+            }
         }
-        if (RECIPE_CACHE.containsKey(item) || DYNAMIC_CACHE.containsKey(item) || BUILTIN_DROPS.containsKey(item)) {
+        if (DYNAMIC_CACHE.containsKey(item) || BUILTIN_DROPS.containsKey(item)) {
             return true;
         }
         if (hasBattleTag(item)) {
