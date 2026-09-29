@@ -322,16 +322,18 @@ public class BattleDropRegistry {
     }
 
     public static boolean isValidBattleTarget(Item item, Level level) {
-        if (level != null) {
-            RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : (level.getServer() != null ? level.getServer().getRecipeManager() : null);
-            if (recipeManager != null) {
-                SingleRecipeInput input = new SingleRecipeInput(new ItemStack(item));
-                if (recipeManager.getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level).isPresent()) {
-                    return true;
-                }
+        if (level != null && level.getServer() != null) {
+            RecipeManager recipeManager = level instanceof ServerLevel sl ? sl.recipeAccess() : level.getServer().getRecipeManager();
+            SingleRecipeInput input = new SingleRecipeInput(new ItemStack(item));
+            if (recipeManager.getRecipeFor(ModRecipes.BATTLE_DROP_TYPE.get(), input, level).isPresent()) {
+                return true;
+            }
+        } else {
+            if (RECIPE_CACHE.containsKey(item)) {
+                return true;
             }
         }
-        if (RECIPE_CACHE.containsKey(item) || DYNAMIC_CACHE.containsKey(item) || BUILTIN_DROPS.containsKey(item)) {
+        if (DYNAMIC_CACHE.containsKey(item) || BUILTIN_DROPS.containsKey(item)) {
             return true;
         }
         if (hasBattleTag(item)) {
