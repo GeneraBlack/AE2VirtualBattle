@@ -327,7 +327,7 @@ public class BattleDropRegistry {
                 return true;
             }
         }
-        if (DYNAMIC_CACHE.containsKey(item) || BUILTIN_DROPS.containsKey(item)) {
+        if (RECIPE_CACHE.containsKey(item) || DYNAMIC_CACHE.containsKey(item) || BUILTIN_DROPS.containsKey(item)) {
             return true;
         }
         if (hasBattleTag(item)) {
